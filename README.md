@@ -1,16 +1,33 @@
-# Machine Learning Engineer Nanodegree
+#  Machine Learning Engineer Nanodegree
 
 ## Capstone Proposal
 Nathan Gilbert
-July 27th, 2019
+June 28th, 2019
 
 ## Proposal
-_(approx. 2-3 pages)_
+
+Web-based Domain-Specific Documentation Summarization
 
 ### Domain Background
 _(approx. 1-2 paragraphs)_
 
-In this section, provide brief details on the background information of the domain from which the project is proposed. Historical information relevant to the project should be included. It should be clear how or why a problem in the domain can or should be solved. Related academic research should be appropriately cited in this section, including why that research is relevant. Additionally, a discussion of your personal motivation for investigating a particular problem in the domain is encouraged but not required.
+In this section, provide brief details on the background information of the
+domain from which the project is proposed. Historical information relevant to
+the project should be included. It should be clear how or why a problem in the
+domain can or should be solved. Related academic research should be
+appropriately cited in this section, including why that research is relevant.
+Additionally, a discussion of your personal motivation for investigating a
+particular problem in the domain is encouraged but not required.
+
+Everyday, we are bombarded with more information than is possible to process.
+The need for the ability to accurately reduce this information overload and for
+identifying and understanding relevant information is a task that can help the
+time required for acquiring and understanding new information. Summaries can
+reduce reading time, personalized summaries can help a reader better understand
+material they care about most.
+
+There has been significant work in the field of Document Summarization over the
+past decade.
 
 ### Problem Statement
 _(approx. 1 paragraph)_
