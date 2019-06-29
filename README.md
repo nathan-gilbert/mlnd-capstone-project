@@ -99,24 +99,48 @@ ROUGE) or the Levenshtein distance
 human summaries.
 
 ### Project Design
-_(approx. 1 page)_
 
-In this final section, summarize a theoretical workflow for approaching
-a solution given the problem. Provide thorough discussion for what strategies
-you may consider employing, what analysis of the data might be required before
-being used, or which algorithms will be considered for your implementation. The
-workflow and discussion that you provide should align with the qualities of the
-previous sections. Additionally, you are encouraged to include small
-visualizations, pseudocode, or diagrams to aid in describing the project design,
-but it is not required. The discussion should clearly outline your intended
-workflow of the capstone project.
+The initial steps of this project will be to acquire and analyze the existing
+data. For the DUC data there are permission and usage forms to fill out and send
+to NIST. For the other data mentioned above, it will be need to be downloaded
+and placed in a location that will make exploration of the data possible with
+Python.
 
------------
+The type of analysis that the data needs will likely be tokenization and basic
+NLP manipulation such as named entity, parsing and part of speech tagging. There
+will also need to be unigram, bigram and potential larger n-gram counts to
+collect as well as term frequency and inverse document frequency values. Stop
+word removal will also be needed. This can all be collected and implemented
+outside of the main model development though it's likely code from these steps
+would also be leveraged in the main model project. Likely the Python Natural
+Language Toolkit will be used to take advantage of the tools within in it that
+do much of this work and manipulation already.
 
-**Before submitting your proposal, ask yourself. . .**
+A format format for summaries needs to be selected that will allow for easily
+scoring with the ROUGE metric and output by the systems to be built. Potentials
+are raw plain text or JSON.
 
-- Does the proposal you have written follow a well-organized structure similar to that of the project template?
-- Is each section (particularly **Solution Statement** and **Project Design**) written in a clear, concise and specific fashion? Are there any ambiguous terms or phrases that need clarification?
-- Would the intended audience of your project be able to understand your proposal?
-- Have you properly proofread your proposal to assure there are minimal grammatical and spelling mistakes?
-- Are all the resources used for this project correctly cited and referenced?# mlnd-capstone-project
+A script to score machine generated summaries via the ROUGE metric needs to be
+implemented. This will be done in Python 3 and included in the project. If
+possible, I will try to use an implementation of the ROUGE metric from the
+available academic literature.
+
+The _FreqSum_ system needs to be implemented so that is may be used as
+a baseline system. This will be done in Python 3 and included in the project.
+
+The _RegSum_ system needs to be implemented in an initial state for quick local
+development and iteration. _RegSum_ utilizes weights from 3 unsupervised
+approaches to summarization as well as features drawn from standard Natural
+Language Processing data manipulation approaches such as Named-Entity
+Recognition and Part of Speech tagging.
+
+Once the baseline model and the RegSum+ (RegSum + any changes and additional
+features I implement during the data analysis) are implemented the RegSum+ model
+will need to tuned.
+
+Deploying the model to AWS and SageMaker can happen during this time as well.
+I will need to create a model available in AWS as well as create an endpoint
+that can be accessed outside of AWS. A simple webpage that can call the endpoint
+and supply a document to it and receive the summary should also be created at
+this time.
+
