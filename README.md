@@ -2,7 +2,7 @@
 
 ## Capstone Proposal
 Nathan Gilbert
-June 29th, 2019
+July 1st, 2019
 
 ## Proposal: Web-based Documentation Summarization
 
@@ -11,23 +11,26 @@ June 29th, 2019
 Everyday we are bombarded with more information than is possible to process.
 Identifying and summarizing relevant information in a given document is a task
 that can help reduce the time required for acquiring and acting on new
-information. Summaries can reduce reading time and personalized summaries can
-help a reader better understand material they care about most.
+information. Accurate summaries can reduce reading time and personalized
+summaries could help a reader better understand material they care about most.
 
 There has been significant work in the field of Document Summarization over the
 past two decades. In the early 2000s, a set of conferences named DUC (Document
 Understanding Conference) focused on text understanding and summarization and
 provided many of the standard data sets still used today. Researchers such as
 Daniel Marcu and Inderjeet Mani have written several books and academic papers
-on the subject detailing machine learning approaches throughout the early 200s
-and 2010s. Recently, the Google Brain team have seen some large gains with
-their Transformer and XLNet based systems: <https://github.com/zihangdai/xlnet>
-Microsoft Word even provides some basic automatic text summarization capabilities.
+on the subject detailing machine learning approaches. Recently, the Google
+Brain team have seen some large gains with their Transformer and XLNet based
+systems: <https://github.com/zihangdai/xlnet> Microsoft Word even provides some
+basic automatic text summarization capabilities.
 
 My personal motivation for studying this topic is its relevance to Natural
 Language Understanding. Identifying the most salient points of an article or
-chunk of information is one step of the way to automatically _understanding_
-the information an author is attempting to convey.
+chunk of information is one step of the way toward automatically
+_understanding_ the information an author is attempting to convey. Document
+Summarization also involves many areas of NLP and requires solving several
+subproblems (e.g. parsing, entailment, entity detection, etc) in order to
+achieve good results which also interests me.
 
 ### Problem Statement
 
