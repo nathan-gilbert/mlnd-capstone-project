@@ -107,7 +107,8 @@ The initial steps of this project will be to acquire and analyze the existing
 data. For the DUC data there are permission and usage forms to fill out and send
 to NIST. For the other data mentioned above, it will be need to be downloaded
 and placed in a location that will make exploration of the data possible with
-Python.
+Python. I have already acquired most of this data and am waiting on NIST to
+reply to my form submissions for the DUC datasets.
 
 The type of analysis that the data needs will likely be tokenization and basic
 NLP manipulation such as named entity, parsing and part of speech tagging. There
@@ -124,9 +125,9 @@ scoring with the ROUGE metric and output by the systems to be built. Potentials
 are raw plain text or JSON.
 
 A script to score machine generated summaries via the ROUGE metric needs to be
-implemented. This will be done in Python 3 and included in the project. If
-possible, I will try to use an implementation of the ROUGE metric from the
-available academic literature.
+implemented. This will be done in Python 3 and included in the project.
+There are implmentations of the ROUGE metric available on researcher's pages
+and Github accounts that are available for free use.
 
 The _FreqSum_ system needs to be implemented so that is may be used as
 a baseline system. This will be done in Python 3 and included in the project.
@@ -139,7 +140,10 @@ Recognition and Part of Speech tagging.
 
 Once the baseline model and the RegSum+ (RegSum + any changes and additional
 features I implement during the data analysis) are implemented the RegSum+ model
-will need to tuned.
+will need to tuned. Many variations of the feature set and hyperparameters will
+need to be tried in order to improve the results of the model. This will be the
+stage to conduct these experiments utilizing the AWS tools we have been
+studying in this course.
 
 Deploying the model to AWS and SageMaker can happen during this time as well.
 I will need to create a model available in AWS as well as create an endpoint
