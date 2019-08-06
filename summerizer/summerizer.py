@@ -1,0 +1,2 @@
+class Summerizer:
+    pass
