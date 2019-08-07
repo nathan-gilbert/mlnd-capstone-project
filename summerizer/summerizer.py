@@ -12,3 +12,7 @@ class Summerizer:
 
     def _create_summary(self):
         pass
+
+    def _cosine_similarity(self):
+        pass
+
