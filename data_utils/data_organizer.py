@@ -1,10 +1,44 @@
 import argparse
+import glob
 import os
 import shutil
 
 
-def do_2003_summaries():
-    pass
+def do_2003_keys(in_dir, out_dir):
+    dir_items = os.listdir(out_dir)
+    dir_items = list(filter(lambda x: os.path.isdir(out_dir + os.path.sep + x), dir_items))
+    dir_items = list(map(int, dir_items))
+    dir_items.sort()
+    dir_items = list(map(str, dir_items))
+    for item in dir_items:
+        print(item)
+        item_full_path = out_dir + os.path.sep + item
+        key_dir_path = item_full_path + os.path.sep + "keys"
+        if not os.path.exists(key_dir_path):
+            os.mkdir(key_dir_path)
+
+        orig_dir_filename = item_full_path + os.path.sep + "original_dir_name.txt"
+        with open(orig_dir_filename, 'r') as orig_dir_file:
+            orig_dir_name = orig_dir_file.readlines()[0]
+
+        # capitalize the first character and remove the last
+        orig_dir_name = list(orig_dir_name)
+        orig_dir_name[0] = str(orig_dir_name[0]).capitalize()
+        orig_dir_name = "".join(orig_dir_name)
+        orig_dir_name = orig_dir_name[:-1]
+        print(orig_dir_name)
+
+        summary_file_path = in_dir + os.path.sep + orig_dir_name + "*"
+        summary_files = glob.glob(summary_file_path)
+        idx = 0
+        for sfi in summary_files:
+            if sfi.find(".100.") > -1:
+                print(sfi + " -> " + str(idx))
+                shutil.copy2(sfi, key_dir_path + os.path.sep + str(idx) + ".txt")
+                with open(key_dir_path + os.path.sep + f"orig_key_name.{idx}.txt",
+                          'w') as orig_key_name:
+                    orig_key_name.write(sfi)
+                idx += 1
 
 
 def do_2003(in_dir, out_dir):
@@ -59,6 +93,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Format DUC Data.')
     parser.add_argument('in_data_directory', metavar='in', type=str,
                         help='The raw data directory')
+    parser.add_argument('in_key_directory', metavar='keys', type=str,
+                        help='The answer key directory')
     parser.add_argument('out_data_directory', metavar='out', type=str,
                         help='The output data directory')
     parser.add_argument('--2003', dest='is2003', action='store_true',
@@ -72,5 +108,6 @@ if __name__ == "__main__":
 
     if args.is2003:
         do_2003(args.in_data_directory, args.out_data_directory)
+        do_2003_keys(args.in_key_directory, args.out_data_directory)
     elif args.is2004:
         do_2004()
