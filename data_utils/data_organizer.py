@@ -82,7 +82,11 @@ def do_2003(in_dir, out_dir):
             shutil.copy2(in_dir + os.path.sep + item + os.path.sep + f_item, final_file_name)
 
 
-def do_2004():
+def do_2004_keys(in_dir, out_dir):
+    pass
+
+
+def do_2004(in_dir, out_dir):
     """
 
     :return:
@@ -110,4 +114,6 @@ if __name__ == "__main__":
         do_2003(args.in_data_directory, args.out_data_directory)
         do_2003_keys(args.in_key_directory, args.out_data_directory)
     elif args.is2004:
-        do_2004()
+        do_2004(args.in_data_directory, args.out_data_directory)
+        do_2004_keys(args.in_key_directory, args.out_data_directory)
+
