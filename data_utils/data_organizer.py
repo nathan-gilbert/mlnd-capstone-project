@@ -35,16 +35,6 @@ def do_2003_keys(in_dir, out_dir):
                 idx += 1
 
 
-def format_docset_name(orig_dir_name):
-    # capitalize the first character and remove the last
-    orig_dir_name = list(orig_dir_name)
-    orig_dir_name[0] = str(orig_dir_name[0]).capitalize()
-    orig_dir_name = "".join(orig_dir_name)
-    orig_dir_name = orig_dir_name[:-1]
-    print(orig_dir_name)
-    return orig_dir_name
-
-
 def do_2003(in_dir, out_dir):
     """
     Grab all 60 documents, create a dir for each, along with their 4 human summaries
@@ -55,45 +45,71 @@ def do_2003(in_dir, out_dir):
     for idx, item in enumerate(dir_items):
         full_path = in_dir + os.path.sep + item
         print(f"{item} -> {idx}")
-        full_out_path = out_dir + os.path.sep + str(idx)
-        if not os.path.isdir(full_out_path):
-            os.mkdir(full_out_path)
-
-        with open(full_out_path + os.path.sep + "original_dir_name.txt", 'w') as orig_dir_name:
-            print("Writing orig_dir_name file...")
-            orig_dir_name.write(item)
-
-        folder_items = os.listdir(full_path)
-        folder_items = list(
-            filter(lambda x: not os.path.isdir(in_dir + os.path.sep + x), folder_items))
-        folder_items.sort()
-        for jdx, f_item in enumerate(folder_items):
-            print(f"{f_item} -> {jdx}.sgml")
-            full_file_out_path = full_out_path + os.path.sep + str(jdx)
-            if not os.path.isdir(full_file_out_path):
-                os.mkdir(full_file_out_path)
-            with open(full_file_out_path + os.path.sep + "original_file_name.txt",
-                      'w') as orig_dir_name:
-                print("Writing origFileName file...")
-                orig_dir_name.write(f_item)
-            final_file_name = full_file_out_path + os.path.sep + str(jdx) + ".sgml"
-            shutil.copy2(in_dir + os.path.sep + item + os.path.sep + f_item, final_file_name)
+        create_dirs_and_write_files(full_path, idx, in_dir, item, out_dir)
 
 
 def do_2004_keys(in_dir, out_dir):
-    pass
+    do_2003_keys(in_dir, out_dir)
 
 
 def do_2004(in_dir, out_dir):
     """
-
-    :return:
+    Handle formatting the DUC 2004 documents
+    :return: a directory containing and an easier to process data set
     """
     dir_items = setup_outdir_and_get_input(in_dir, out_dir)
     for idx, item in enumerate(dir_items):
         full_path = in_dir + os.path.sep + item
-        orig_dir_name = format_docset_name(item)
-        print(f"{full_path}/item -> {orig_dir_name}")
+        print(f"{full_path} -> {out_dir}/{idx}")
+        create_dirs_and_write_files(full_path, idx, in_dir, item, out_dir)
+
+
+def format_docset_name(orig_dir_name):
+    # capitalize the first character and remove the last
+    orig_dir_name = list(orig_dir_name)
+    orig_dir_name[0] = str(orig_dir_name[0]).capitalize()
+    orig_dir_name = "".join(orig_dir_name)
+    orig_dir_name = orig_dir_name[:-1]
+    print(orig_dir_name)
+    return orig_dir_name
+
+
+def create_dirs_and_write_files(full_path, idx, in_dir, item, out_dir):
+    full_out_path = out_dir + os.path.sep + str(idx)
+    preserve_orig_dir_name(full_out_path, item)
+    folder_items = get_folder_contents(in_dir, full_path)
+    for jdx, f_item in enumerate(folder_items):
+        print(f"{f_item} -> {jdx}.sgml")
+        full_file_out_path = create_subfolder_preserve_old_filename(f_item, full_out_path, jdx)
+        final_file_name = full_file_out_path + os.path.sep + str(jdx) + ".sgml"
+        shutil.copy2(in_dir + os.path.sep + item + os.path.sep + f_item, final_file_name)
+
+
+def create_subfolder_preserve_old_filename(f_item, full_out_path, jdx):
+    full_file_out_path = full_out_path + os.path.sep + str(jdx)
+    if not os.path.isdir(full_file_out_path):
+        os.mkdir(full_file_out_path)
+    with open(full_file_out_path + os.path.sep + "original_file_name.txt",
+              'w') as orig_dir_name:
+        print("Writing origFileName file...")
+        orig_dir_name.write(f_item)
+    return full_file_out_path
+
+
+def get_folder_contents(in_dir, full_path):
+    folder_items = os.listdir(full_path)
+    folder_items = list(
+        filter(lambda x: not os.path.isdir(in_dir + os.path.sep + x), folder_items))
+    folder_items.sort()
+    return folder_items
+
+
+def preserve_orig_dir_name(full_out_path, item):
+    if not os.path.isdir(full_out_path):
+        os.mkdir(full_out_path)
+    with open(full_out_path + os.path.sep + "original_dir_name.txt", 'w') as orig_dir_name:
+        print("Writing orig_dir_name file...")
+        orig_dir_name.write(item)
 
 
 def setup_outdir_and_get_input(in_dir, out_dir):
@@ -129,4 +145,3 @@ if __name__ == "__main__":
     elif args.is2004:
         do_2004(args.in_data_directory, args.out_data_directory)
         do_2004_keys(args.in_key_directory, args.out_data_directory)
-
