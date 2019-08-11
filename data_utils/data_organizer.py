@@ -21,13 +21,7 @@ def do_2003_keys(in_dir, out_dir):
         with open(orig_dir_filename, 'r') as orig_dir_file:
             orig_dir_name = orig_dir_file.readlines()[0]
 
-        # capitalize the first character and remove the last
-        orig_dir_name = list(orig_dir_name)
-        orig_dir_name[0] = str(orig_dir_name[0]).capitalize()
-        orig_dir_name = "".join(orig_dir_name)
-        orig_dir_name = orig_dir_name[:-1]
-        print(orig_dir_name)
-
+        orig_dir_name = format_docset_name(orig_dir_name)
         summary_file_path = in_dir + os.path.sep + orig_dir_name + "*"
         summary_files = glob.glob(summary_file_path)
         idx = 0
@@ -41,19 +35,23 @@ def do_2003_keys(in_dir, out_dir):
                 idx += 1
 
 
+def format_docset_name(orig_dir_name):
+    # capitalize the first character and remove the last
+    orig_dir_name = list(orig_dir_name)
+    orig_dir_name[0] = str(orig_dir_name[0]).capitalize()
+    orig_dir_name = "".join(orig_dir_name)
+    orig_dir_name = orig_dir_name[:-1]
+    print(orig_dir_name)
+    return orig_dir_name
+
+
 def do_2003(in_dir, out_dir):
     """
     Grab all 60 documents, create a dir for each, along with their 4 human summaries
     :return:
     """
 
-    # check that out dir exists
-    if not os.path.exists(out_dir):
-        os.mkdir(out_dir)
-
-    dir_items = os.listdir(in_dir)
-    dir_items = list(filter(lambda x: os.path.isdir(in_dir + os.path.sep + x), dir_items))
-    dir_items.sort()
+    dir_items = setup_outdir_and_get_input(in_dir, out_dir)
     for idx, item in enumerate(dir_items):
         full_path = in_dir + os.path.sep + item
         print(f"{item} -> {idx}")
@@ -91,6 +89,21 @@ def do_2004(in_dir, out_dir):
 
     :return:
     """
+    dir_items = setup_outdir_and_get_input(in_dir, out_dir)
+    for idx, item in enumerate(dir_items):
+        full_path = in_dir + os.path.sep + item
+        orig_dir_name = format_docset_name(item)
+        print(f"{full_path}/item -> {orig_dir_name}")
+
+
+def setup_outdir_and_get_input(in_dir, out_dir):
+    # check that out dir exists
+    if not os.path.exists(out_dir):
+        os.mkdir(out_dir)
+    dir_items = os.listdir(in_dir)
+    dir_items = list(filter(lambda x: os.path.isdir(in_dir + os.path.sep + x), dir_items))
+    dir_items.sort()
+    return dir_items
 
 
 if __name__ == "__main__":
