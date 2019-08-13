@@ -1,3 +1,5 @@
+import os
+
 from nltk.tokenize import TreebankWordTokenizer as twt
 
 
@@ -15,6 +17,6 @@ class Tokenizer:
         tokens = self.tokenize(doc_text)
         spans = self.get_token_spans(doc_text)
 
-        with open(out_dir + "tokens", 'w') as tokens_file:
+        with open(out_dir + os.path.sep + "tokens", 'w') as tokens_file:
             for token, span in zip(tokens, spans):
-                tokens_file.write(f"{token}, {span}\n")
+                tokens_file.write(f"{token}\t{span}\n")
