@@ -30,8 +30,7 @@ class Annotation:
 
     def __eq__(self, other):
         if self.__start == other.get_start() and self.__end == other.get_end() \
-            and self.__text == other.get_text() \
-            and self.__label == other.get_label():
+            and self.__text == other.get_text() and self.__label == other.get_label():
             return True
         return False
 

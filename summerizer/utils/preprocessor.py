@@ -2,6 +2,7 @@ import os
 
 from bs4 import BeautifulSoup
 
+from summerizer.utils.sentence_splitter import SentenceSplitter
 from summerizer.utils.tokenizer import Tokenizer
 
 
@@ -29,6 +30,7 @@ class Preprocessor:
 
     def run(self):
         tok = Tokenizer()
+        sent = SentenceSplitter()
         for doc in self.__document_list:
             print(f"Processing document {doc}")
             for sub_doc in self.get_sub_document_folders(doc):
@@ -38,6 +40,7 @@ class Preprocessor:
                 if not os.path.exists(out_dir):
                     os.mkdir(out_dir)
                 tok.tokenize_document(out_dir, doc_text)
+                sent.sentence_split_document(out_dir, doc_text)
 
     def __get_document_list(self, doc_list):
         with open(doc_list, 'r') as doc_list_file:

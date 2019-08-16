@@ -18,6 +18,8 @@ class Tokenizer:
         token_set = AnnotationSet("tokens")
         tokens = self.tokenize(doc_text)
         spans = self.get_token_spans(doc_text)
+        ann_id = 0
         for token, span in zip(tokens, spans):
-            token_set.add(Annotation(0, token, "token", span[0], span[1]))
+            token_set.add(Annotation(ann_id, token, "token", span[0], span[1]))
+            ann_id += 1
         token_set.write_annotation_file(out_dir)
