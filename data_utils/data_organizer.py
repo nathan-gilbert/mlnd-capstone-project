@@ -99,7 +99,8 @@ def create_subfolder_preserve_old_filename(f_item, full_out_path, jdx):
 def get_folder_contents(in_dir, full_path):
     folder_items = os.listdir(full_path)
     folder_items = list(
-        filter(lambda x: not os.path.isdir(in_dir + os.path.sep + x), folder_items))
+        filter(lambda x: not os.path.isdir(in_dir + os.path.sep + x), folder_items)
+    )
     folder_items.sort()
     return folder_items
 

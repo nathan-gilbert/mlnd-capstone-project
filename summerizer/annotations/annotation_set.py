@@ -15,13 +15,10 @@ class AnnotationSet:
         return self.forward()
 
     def __str__(self):
-        final_str = ""
-        for ann in self.__annotations:
-            final_str += ann.pprint() + "\n"
-        return self.__set_name + "\n" + final_str
+        return self.__set_name
 
-    def __getitem__(self, key):
-        return self.__annotations[key]
+    def get_name(self):
+        return self.__set_name
 
     def pop(self, i=0):
         """Pops the ith item from the set, defaults to the first."""
@@ -30,9 +27,6 @@ class AnnotationSet:
     def forward(self):
         for ann in self.__annotations:
             yield ann
-
-    def get_name(self):
-        return self.__set_name
 
     def remove(self, i):
         """ removes the ith element from the annotations """
@@ -103,8 +97,7 @@ class AnnotationSet:
     def get_contained_set(self, annotation):
         subset = AnnotationSet("contained")
         for ann in self.__annotations:
-            if annotation.getStart() >= ann.getStart() \
-                and annotation.getEnd() <= ann.getEnd():
+            if annotation.getStart() >= ann.getStart() and annotation.getEnd() <= ann.getEnd():
                 subset.add(ann)
         return subset
 

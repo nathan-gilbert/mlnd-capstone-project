@@ -1,6 +1,7 @@
 from rouge import Rouge
 
 
+# pylint: disable=too-few-public-methods
 class Scorer:
     def __init__(self):
         self.rouge = Rouge()

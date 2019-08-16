@@ -1,8 +1,9 @@
 class Summerizer:
     def __init__(self):
-        self._model = None
-        self._training_docs = []
-        self._test_docs = []
+        self.model = None
+        self.training_dir = ""
+        self.training_docs = []
+        self.test_docs = []
 
     def train(self):
         pass
@@ -15,4 +16,3 @@ class Summerizer:
 
     def _cosine_similarity(self):
         pass
-
