@@ -17,6 +17,12 @@ class AnnotationSet:
     def __str__(self):
         return self.__set_name
 
+    def __getitem__(self, item):
+        try:
+            return self.__annotations[0]
+        except IndexError:
+            return None
+
     def get_name(self):
         return self.__set_name
 

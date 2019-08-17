@@ -32,4 +32,4 @@ class DocumentSet:
 
         :return: All the text in this document set concatenated into one string
         """
-        return "\n".join([doc.annotations["full_text"].get_text() for doc in self.documents])
+        return "\n".join([doc.annotations["full_text"][0].get_text() for doc in self.documents])
