@@ -2,6 +2,7 @@ import os
 
 from bs4 import BeautifulSoup
 
+from summerizer.utils.full_text import FullText
 from summerizer.utils.sentence_splitter import SentenceSplitter
 from summerizer.utils.tokenizer import Tokenizer
 
@@ -39,6 +40,7 @@ class Preprocessor:
                 out_dir = doc + os.path.sep + sub_doc + os.path.sep + "annotations"
                 if not os.path.exists(out_dir):
                     os.mkdir(out_dir)
+                FullText.extract_full_text(out_dir, doc_text)
                 tok.tokenize_document(out_dir, doc_text)
                 sent.sentence_split_document(out_dir, doc_text)
 

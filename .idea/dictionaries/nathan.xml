@@ -4,6 +4,8 @@
       <w>pylint</w>
       <w>summarization</w>
       <w>summerizer</w>
+      <w>tfidf</w>
+      <w>vectorizer</w>
     </words>
   </dictionary>
 </component>
