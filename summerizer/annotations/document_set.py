@@ -7,6 +7,7 @@ class DocumentSet:
         # attributes collected from all documents in the set
         self.attributes = {}
         self._set_name = n
+        self.word_counts = None
 
     def name(self):
         return self._set_name
@@ -19,12 +20,12 @@ class DocumentSet:
         :return: A dictionary mapping words to their counts in this document set
         """
         # iterate the documents and count the number of non-stop words
-        cv = CountVectorizer()
+        counts = CountVectorizer()
         texts = self.get_corpus_text()
-        cv_fit = cv.fit_transform(texts)
-        word_list = cv.get_feature_names();
+        cv_fit = counts.fit_transform([texts])
+        word_list = counts.get_feature_names()
         count_list = cv_fit.toarray().sum(axis=0)
-        return dict(zip(word_list, count_list))
+        self.word_counts = dict(zip(word_list, count_list))
 
     def get_corpus_text(self):
         """
@@ -32,4 +33,4 @@ class DocumentSet:
 
         :return: All the text in this document set concatenated into one string
         """
-        return "\n".join([doc.annotations["full_text"][0].get_text() for doc in self.documents])
+        return "\n".join([doc.annotations["full_text"][0].text for doc in self.documents])

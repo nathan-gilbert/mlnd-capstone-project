@@ -4,78 +4,62 @@ import json
 class Annotation:
     # pylint: disable=too-many-arguments
     def __init__(self, i, text, label, start, end):
-        self.__id = int(i)
-        self.__start = int(start)
-        self.__end = int(end)
-        self.__text = str(text)
-        self.__label = str(label)
+        self.id = int(i)
+        self.start = int(start)
+        self.end = int(end)
+        self.text = str(text)
+        self.label = str(label)
 
     def __len__(self):
-        return len(self.__text)
+        return len(self.text)
 
     def __str__(self):
         return self.to_json()
 
     def __lt__(self, other):
-        return self.__start < other.get_start()
+        return self.start < other.start
 
     def __le__(self, other):
-        return self.__start <= other.get_start()
+        return self.start <= other.start
 
     def __gt__(self, other):
-        return self.__start > other.get_start()
+        return self.start > other.start
 
     def __ge__(self, other):
-        return self.__start >= other.get_start()
+        return self.start >= other.start
 
     def __eq__(self, other):
-        if self.__start == other.get_start() and self.__end == other.get_end() \
-            and self.__text == other.get_text() and self.__label == other.get_label():
+        if self.start == other.start and self.end == other.end \
+            and self.text == other.text and self.label == other.label:
             return True
         return False
 
     def __ne__(self, other):
-        if self.__start != other.get_start() or self.__end != other.get_end() \
-            or self.__text != other.get_text() \
-            or self.__label != other.get_label():
+        if self.start != other.start or self.end != other.end \
+            or self.text != other.text or self.label != other.label:
             return True
         return False
 
-    def get_id(self):
-        return self.__id
-
-    def get_start(self):
-        return self.__start
-
-    def get_end(self):
-        return self.__end
-
-    def get_text(self):
-        return self.__text
-
     def get_span(self):
-        return self.__start, self.__end
-
-    def get_label(self):
-        return self.__label
+        return self.start, self.end
 
     def contains(self, other):
-        return (self.__start <= other.get_start()) and (self.__end >= other.get_end())
+        return (self.start <= other.start) and (self.end >= other.end)
 
     def clean_text(self):
-        return "%s" % self.__text.replace("\n", " ")
+        return "%s" % self.text.replace("\n", " ")
 
     def clean_text_and_span(self):
-        txt = self.__text.replace("\n", " ")
-        return "%s (%d,%d)" % (txt, self.__start, self.__end)
+        txt = self.text.replace("\n", " ")
+        return "%s (%d,%d)" % (txt, self.start, self.end)
 
     def to_dict(self):
         a_dict = {
-            "id": self.__id,
-            "start": self.__start,
-            "end": self.__end,
-            "text": self.__text,
-            "label": self.__label
+            "id": self.id,
+            "start": self.start,
+            "end": self.end,
+            "text": self.text,
+            "label": self.label
         }
         return a_dict
 

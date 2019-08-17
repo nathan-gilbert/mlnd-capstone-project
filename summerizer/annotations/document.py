@@ -12,8 +12,6 @@ class Document:
         self._filename = fn
         self._file_full_path = f"{self._parent_directory}{os.path.sep}{self._filename}{os.path.sep}"
         self._ann_dir = "annotations"
-        self._full_text = ""
-
         self.__initialize_document(annotation_types)
 
     def __initialize_document(self, annotation_types):

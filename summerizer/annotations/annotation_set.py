@@ -1,6 +1,8 @@
 import json
 import os
 
+from summerizer.annotations.annotation import Annotation
+
 
 # pylint: disable=too-many-public-methods
 class AnnotationSet:
@@ -17,9 +19,9 @@ class AnnotationSet:
     def __str__(self):
         return self.__set_name
 
-    def __getitem__(self, item):
+    def __getitem__(self, index):
         try:
-            return self.__annotations[0]
+            return self.__annotations[index]
         except IndexError:
             return None
 
@@ -53,7 +55,7 @@ class AnnotationSet:
     def remove_annotation_by_id(self, i):
         remove_index = -1
         for j in range(0, len(self.__annotations)):
-            if self.__annotations[j].getID() == i:
+            if self.__annotations[j].id == i:
                 remove_index = j
         if remove_index > -1:
             del self.__annotations[remove_index]
@@ -87,7 +89,7 @@ class AnnotationSet:
         provided."""
         subset = AnnotationSet("subset")
         for ann in self.__annotations:
-            if ann.getStart() >= start and ann.getEnd() <= end:
+            if ann.start >= start and ann.end <= end:
                 subset.add(ann)
         return subset
 
@@ -97,20 +99,20 @@ class AnnotationSet:
         annotation provided.
         """
         overlapping = AnnotationSet("overlapping")
-        overlapping.add_all(self.get_subset(annotation.getStart(), annotation.getEnd()))
+        overlapping.add_all(self.get_subset(annotation.start, annotation.end))
         return overlapping
 
     def get_contained_set(self, annotation):
         subset = AnnotationSet("contained")
         for ann in self.__annotations:
-            if annotation.getStart() >= ann.getStart() and annotation.getEnd() <= ann.getEnd():
+            if annotation.start >= ann.start and annotation.end <= ann.end:
                 subset.add(ann)
         return subset
 
     def get_annotation_by_span(self, start, end):
         """Return annotation that matches the given span."""
         for ann in self.__annotations:
-            if start == ann.getStart() and end == ann.getEnd():
+            if start == ann.start and end == ann.end:
                 return ann
         return None
 
@@ -119,7 +121,7 @@ class AnnotationSet:
         id number."""
         num = int(num)
         for ann in self.__annotations:
-            if ann.get_id() == num:
+            if ann.id == num:
                 return ann
         return None
 
@@ -135,13 +137,13 @@ class AnnotationSet:
     def get_next_annotation(self, other):
         """Returns the next annotation in the container, otherwise None"""
         for ann in self.__annotations:
-            if ann.getStart() > other.getEnd():
+            if ann.start > other.end:
                 return ann
         return None
 
     def get_next_id(self):
         max_id = -1
-        ids = [ann.get_id() for ann in self.__annotations]
+        ids = [ann.id for ann in self.__annotations]
         for i in ids:
             if i > max_id:
                 max_id = i
@@ -151,7 +153,7 @@ class AnnotationSet:
         """returns the previous annotation."""
         prev = None
         for ann in self.__annotations:
-            if ann.getEnd() >= other.getStart():
+            if ann.end >= other.start:
                 return prev
             prev = ann
         return prev
@@ -194,6 +196,11 @@ class AnnotationSet:
         :param src:  the file to read from
         """
         with open(src, 'r') as in_file:
+            # reset this annotation set
+            self.__annotations = []
             json_obj = json.loads(''.join(in_file.readlines()))
-            self.__annotations = json_obj["annotations"]
+            for ann_dict in json_obj["annotations"]:
+                self.add(Annotation(ann_dict["id"], ann_dict["text"],
+                                    ann_dict["label"], ann_dict["start"],
+                                    ann_dict["end"]))
             self.__set_name = json_obj["set_name"]

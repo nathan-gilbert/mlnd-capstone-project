@@ -29,19 +29,14 @@ class FreqSum(Summerizer):
                 doc_set.add(processed_doc)
             all_training_doc_sets.append(doc_set)
 
-        for ds in all_training_doc_sets:
-            ds.create_word_probabilities()
+        for doc_set in all_training_doc_sets:
+            doc_set.create_word_probabilities()
 
+        print("Created FreqSum model over training docs...")
         self.model = all_training_doc_sets
 
     def predict(self):
-        # Generate the summaries
-        for ds in self.model:
-            doc_summary = self.create_summary()
-            score = self.scorer(doc_summary, "key")
-            print(score)
+        pass
 
     def create_summary(self):
         raise NotImplementedError
-
-
