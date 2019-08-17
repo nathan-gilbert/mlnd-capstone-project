@@ -9,6 +9,16 @@ class DocumentSet:
         self._set_name = n
         self.word_counts = None
 
+    def __iter__(self):
+        for doc in self.documents:
+            yield doc
+
+    def get_doc_by_name(self, doc_name):
+        for doc in self.documents:
+            if doc.name == doc_name:
+                return doc
+        return None
+
     def name(self):
         return self._set_name
 
