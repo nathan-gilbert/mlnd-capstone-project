@@ -64,7 +64,9 @@ class FreqSum(Summerizer):
         for doc in self.test_docs:
             print(f"{self.test_dir}{os.path.sep}{doc}")
             input_doc_set = self.model[doc]
-            summaries[doc] = self.create_summary(input_doc_set)
+            test_doc_path = f"{self.test_dir}{os.path.sep}{doc}"
+            summaries[test_doc_path] = self.create_summary(input_doc_set)
+        return summaries
 
     def create_summary(self, src_docs):
         """
@@ -88,8 +90,8 @@ class FreqSum(Summerizer):
                 cf_sums[sentence.text] = sentence_cf_sum
 
         # sort the sum values and create the summary list
-        sorted_cf_sums = sorted(cf_sums.items(), key=operator.itemgetter(1))
-        for text in sorted_cf_sums:
-            if text not in summary and len(summary) < 5:
-                summary.append(text)
+        sorted_cf_sums = sorted(cf_sums.items(), key=operator.itemgetter(1), reverse=True)
+        for pair in sorted_cf_sums:
+            if pair[0] not in summary and len(summary) < 5:
+                summary.append(pair[0])
         return summary

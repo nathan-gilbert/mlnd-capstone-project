@@ -1,9 +1,11 @@
+import os
 import string
 
 import nltk
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+from summerizer.annotations.annotation_set import AnnotationSet
 from summerizer.utils.scorer import Scorer
 
 
@@ -14,7 +16,7 @@ class Summerizer:
         self.training_docs = []
         self.test_dir = ""
         self.test_docs = []
-        self.scorer = Scorer
+        self.scorer = Scorer()
 
     @staticmethod
     def _stem_tokens(tokens):
@@ -42,6 +44,18 @@ class Summerizer:
 
     def create_summary(self, src_docs):
         raise NotImplementedError
+
+    def score(self, summaries):
+        sep = os.path.sep
+        for test_doc_path, hypothesis in summaries.items():
+            print(f"Scoring document {test_doc_path}")
+            keys = AnnotationSet("answer_keys")
+            key_file = f"{test_doc_path}{sep}keys{sep}annotations{sep}answer_keys"
+            keys.read_annotation_file(key_file)
+            hypothesis = '\n'.join(hypothesis)
+            reference = keys.get(0).text
+            scores = self.scorer.rouge_score(hypothesis, reference)
+            print(scores)
 
     def _cosine_similarity(self, text1, text2):
         vectorizer = TfidfVectorizer(tokenizer=self._normalize_with_stem, stop_words='english')
