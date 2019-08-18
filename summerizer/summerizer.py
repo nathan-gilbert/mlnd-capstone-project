@@ -57,6 +57,13 @@ class Summerizer:
             scores = self.scorer.rouge_score(hypothesis, reference)
             print(scores)
 
+    def _cosine_sim_check(self, potential, summaries):
+        # check if cosine similarity of potential is <= 0.5
+        for summary in summaries:
+            if self._cosine_similarity(potential, summary) <= 0.5:
+                return True
+        return False
+
     def _cosine_similarity(self, text1, text2):
         vectorizer = TfidfVectorizer(tokenizer=self._normalize_with_stem, stop_words='english')
         tfidf = vectorizer.fit_transform([text1, text2])
@@ -65,3 +72,4 @@ class Summerizer:
     def _normalize_with_stem(self, text):
         remove_punctuation_map = dict((ord(char), None) for char in string.punctuation)
         return self._stem_tokens(nltk.word_tokenize(text.lower().translate(remove_punctuation_map)))
+

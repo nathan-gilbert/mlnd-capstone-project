@@ -7,5 +7,5 @@ class Scorer:
         self.rouge = Rouge()
 
     def rouge_score(self, hypothesis, reference):
-        scores = self.rouge.get_scores(hypothesis, reference)
+        scores = self.rouge.get_scores(hypothesis, reference, avg=True)
         return scores
