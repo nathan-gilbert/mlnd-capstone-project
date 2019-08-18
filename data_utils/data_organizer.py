@@ -113,6 +113,7 @@ def get_subfolders(full_path):
     folder_items.sort()
     return folder_items
 
+
 def preserve_orig_dir_name(full_out_path, item):
     if not os.path.isdir(full_out_path):
         os.mkdir(full_out_path)
