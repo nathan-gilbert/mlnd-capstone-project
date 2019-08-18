@@ -91,7 +91,9 @@ class FreqSum(Summerizer):
 
         # sort the sum values and create the summary list
         sorted_cf_sums = sorted(cf_sums.items(), key=operator.itemgetter(1), reverse=True)
-        for text, cf_sum in sorted_cf_sums:
-            if self._cosine_sim_check(text, summary) and self._size_check(text, summary):
+        for text, _ in sorted_cf_sums:
+            if self._cosine_sim_check(text, summary):
                 summary.append(text)
+            if self._size_check(summary):
+                break
         return summary

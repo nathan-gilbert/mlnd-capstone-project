@@ -17,6 +17,7 @@ class Summerizer:
         self.test_dir = ""
         self.test_docs = []
         self.scorer = Scorer()
+        self.__remove_punctuation_map = dict((ord(char), None) for char in string.punctuation)
 
     @staticmethod
     def _stem_tokens(tokens):
@@ -47,29 +48,61 @@ class Summerizer:
 
     def score(self, summaries):
         sep = os.path.sep
+        data = []
         for test_doc_path, hypothesis in summaries.items():
             print(f"Scoring document {test_doc_path}")
             keys = AnnotationSet("answer_keys")
             key_file = f"{test_doc_path}{sep}keys{sep}annotations{sep}answer_keys"
             keys.read_annotation_file(key_file)
-            hypothesis = '\n'.join(hypothesis)
-            reference = keys.get(0).text
-            scores = self.scorer.rouge_score(hypothesis, reference)
-            print(scores)
+            hyp = ' '.join(hypothesis)
+            hyp = hyp.replace("\n", " ")
+            ref = keys.get(0).text.replace("\n", " ")
+            data.append({"hyp": hyp, "ref": ref})
+
+        hyps, refs = map(list, zip(*[[d['hyp'], d['ref']] for d in data]))
+        scores = self.scorer.rouge_score(hyps, refs)
+        return scores
 
     def _cosine_sim_check(self, potential, summaries):
-        # check if cosine similarity of potential is <= 0.5
+        """
+         If the potential is similar with any existing sentence, don't add it
+        :param potential: sentence to maybe add to summary
+        :param summaries: the existing summary
+        :return: True if similar, False if not
+        """
         for summary in summaries:
-            if self._cosine_similarity(potential, summary) <= 0.5:
-                return True
-        return False
+            if self._cosine_similarity(potential, summary) >= 0.5:
+                return False
+        return True
 
     def _cosine_similarity(self, text1, text2):
+        """
+        Compare Cosine Similarity vectors of two texts
+        :param text1:
+        :param text2:
+        :return: Cosine Similarity
+        """
         vectorizer = TfidfVectorizer(tokenizer=self._normalize_with_stem, stop_words='english')
         tfidf = vectorizer.fit_transform([text1, text2])
         return (tfidf * tfidf.T).A[0, 1]
 
     def _normalize_with_stem(self, text):
-        remove_punctuation_map = dict((ord(char), None) for char in string.punctuation)
-        return self._stem_tokens(nltk.word_tokenize(text.lower().translate(remove_punctuation_map)))
+        """
+        :param text:
+        :return: Sentence tokens that are lowercase, no punctuation and stemmed
+        """
+        return self._stem_tokens(
+            nltk.word_tokenize(text.lower().translate(self.__remove_punctuation_map))
+        )
 
+    def _size_check(self, summaries):
+        """
+        DUC summaries have a maximum of 100 words
+        :param summaries:
+        :return: True if summaries have more than 100 words, False otherwise
+        """
+        text = ' '.join(summaries)
+        total_tokens = nltk.word_tokenize(
+            text.lower().translate(self.__remove_punctuation_map)
+        )
+        return len(total_tokens) > 100
