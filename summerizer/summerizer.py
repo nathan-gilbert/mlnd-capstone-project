@@ -82,7 +82,7 @@ class Summerizer:
         :param text2:
         :return: Cosine Similarity
         """
-        vectorizer = TfidfVectorizer(tokenizer=self._normalize_with_stem, stop_words='english')
+        vectorizer = TfidfVectorizer(tokenizer=self._normalize, stop_words='english')
         tfidf = vectorizer.fit_transform([text1, text2])
         return (tfidf * tfidf.T).A[0, 1]
 
