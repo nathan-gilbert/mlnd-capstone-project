@@ -56,14 +56,16 @@ class RegSum(Summerizer):
                                      key=operator.itemgetter(1),
                                      reverse=True)[:1000]
         self.__unsupervised_features(all_training_doc_sets, global_counts, top_1000_counts)
-        self.__word_location_features(all_training_doc_sets)
-        self.__word_type_features(all_training_doc_sets)
+        # self.__word_location_features(all_training_doc_sets)
+        # self.__word_type_features(all_training_doc_sets)
 
     def __unsupervised_features(self, all_docs_sets, global_counts, top_1000_counts):
         # FreqSum - take the top K words from training data
         # LLR - input document vs entire corpus
         # TextRank
-        pass
+        for doc_set in all_docs_sets:
+            for doc in doc_set:
+                sentences = doc.annotations["sentences"]
 
     def __word_location_features(self, all_docs):
         # 6 types
