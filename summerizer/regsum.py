@@ -11,12 +11,14 @@ class RegSum(Summerizer):
     def __init__(self):
         super().__init__()
         self.__summary = []
-        self.training_vector = None
+        self.feature_vector = None
+        self.feature_vector_columns = None
         self.model = LogisticRegression()
 
     def train(self):
         self.__generate_features()
-        # todo train the model
+        self.__get_labels()
+        self.model.fit(self.feature_vector, labels)
 
     def predict(self):
         pass
@@ -59,13 +61,23 @@ class RegSum(Summerizer):
         # self.__word_location_features(all_training_doc_sets)
         # self.__word_type_features(all_training_doc_sets)
 
-    def __unsupervised_features(self, all_docs_sets, global_counts, top_1000_counts):
+    def __unsupervised_features(self, all_docs_sets, global_counts, top_k_counts):
         # FreqSum - take the top K words from training data
-        # LLR - input document vs entire corpus
-        # TextRank
         for doc_set in all_docs_sets:
             for doc in doc_set:
                 sentences = doc.annotations["sentences"]
+                for sentence in sentences:
+                    word_list = self._remove_stop_words(self._normalize(sentence.text))
+                    for top_k in top_k_counts:
+                        self.feature_vector_columns.append(top_k)
+                        if top_k in word_list:
+                            self.feature_vector.append(doc_set.word_counts.get(top_k, 0.0))
+                        else:
+                            self.feature_vector.append(0.0)
+
+        # LLR - input document vs entire corpus
+
+        # TextRank
 
     def __word_location_features(self, all_docs):
         # 6 types
@@ -79,4 +91,7 @@ class RegSum(Summerizer):
         # part of speech tags
         # named entity
         # unigrams from training documents
+        pass
+
+    def __get_labels(self):
         pass
