@@ -1,10 +1,8 @@
-import os
 import operator
-from summerizer.annotations.document import Document
-from summerizer.annotations.document_set import DocumentSet
-from data_utils.data_organizer import get_subfolders
-from summerizer.summerizer import Summerizer
+
 from sklearn.linear_model import LogisticRegression
+
+from summerizer.summerizer import Summerizer
 
 
 class RegSum(Summerizer):
@@ -17,7 +15,7 @@ class RegSum(Summerizer):
 
     def train(self):
         self.__generate_features()
-        self.__get_labels()
+        labels = self.__get_labels()
         self.model.fit(self.feature_vector, labels)
 
     def predict(self):
@@ -29,21 +27,7 @@ class RegSum(Summerizer):
     def __generate_features(self):
         # iterate over sentences and build feature vectors
         print("Training on documents: ")
-        all_training_doc_sets = {}
-
-        for doc in self.training_docs:
-            # contains one set of documents from DUC
-            print(f"{self.training_dir}{os.path.sep}{doc}")
-            doc_set = DocumentSet(doc)
-            doc_path = self.training_dir + os.path.sep + doc
-            input_docs = get_subfolders(doc_path)
-            for in_doc in input_docs:
-                if in_doc == 'keys':
-                    # skip the keys for now...
-                    continue
-                processed_doc = Document(doc_path, in_doc, ["full_text", "sentences", "tokens"])
-                doc_set.add(processed_doc)
-            all_training_doc_sets[doc] = doc_set
+        all_training_doc_sets = self._text_sents_tokens()
 
         global_counts = {}
         top_1000_counts = []

@@ -5,7 +5,10 @@ import nltk
 from nltk.corpus import stopwords
 from sklearn.feature_extraction.text import TfidfVectorizer
 
+from data_utils.data_organizer import get_subfolders
 from summerizer.annotations.annotation_set import AnnotationSet
+from summerizer.annotations.document import Document
+from summerizer.annotations.document_set import DocumentSet
 from summerizer.utils.scorer import Scorer
 
 
@@ -106,3 +109,20 @@ class Summerizer:
             text.lower().translate(self.__remove_punctuation_map)
         )
         return len(total_tokens) > 100
+
+    def _text_sents_tokens(self):
+        all_training_doc_sets = {}
+        for doc in self.training_docs:
+            # contains one set of documents from DUC
+            print(f"{self.training_dir}{os.path.sep}{doc}")
+            doc_set = DocumentSet(doc)
+            doc_path = self.training_dir + os.path.sep + doc
+            input_docs = get_subfolders(doc_path)
+            for in_doc in input_docs:
+                if in_doc == 'keys':
+                    # skip the keys for now...
+                    continue
+                processed_doc = Document(doc_path, in_doc, ["full_text", "sentences", "tokens"])
+                doc_set.add(processed_doc)
+            all_training_doc_sets[doc] = doc_set
+        return all_training_doc_sets
