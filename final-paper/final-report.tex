@@ -1,7 +1,7 @@
 \documentclass{article}
 \begin{document}
 
-\title{An Exploration of On-Demand Text Summerization}
+\title{An Exploration of On-Demand Text Summarization}
 \author{Nathan Gilbert}
 
 \maketitle
@@ -16,7 +16,7 @@
     a web service for serving summarizations on demand.
 \end{abstract}
 
-\section{Introduction}
+\section{Project Overview}
 Everyday we are bombarded with more information than is possible to process.
 Identifying and summarizing relevant information in a given document is a task
 that can help reduce the time required for acquiring and acting on new
@@ -42,7 +42,6 @@ Document Summarization also involves many areas of NLP and requires solving seve
 subproblems (e.g.\ parsing, entailment, entity detection, etc) in order to
 achieve good results which also interests me.
 
-\subsection{Project Overview}
 
 \subsection{Problem Statement}
 
@@ -135,7 +134,7 @@ and Github accounts that are available for free use.
 The \emph{FreqSum} system needs to be implemented so that is may be used as
 a baseline system. This will be done in Python 3 and included in the project.
 
-The \emph{RegSum} system needs to be implemented in an initial state for quick local
+The \emph{RegSum}\cite{RegSum} system needs to be implemented in an initial state for quick local
 development and iteration. \emph{RegSum} utilizes weights from 3 unsupervised
 approaches to summarization as well as features drawn from standard Natural
 Language Processing data manipulation approaches such as Named-Entity
@@ -172,6 +171,14 @@ this time.
     Kai Hong, John M. Conroy, Benoit Favre, Alex Kulesza, Hui Lin and Ani Nenkova,
     \emph{A Repository of State of the Art and Competitive Baseline Summaries for Generic News Summarization,}
     Proceedings of LREC, 2014.
+    \bibitem{RegSum}
+    Kai Hong and Ani Nenkova,
+    \emph{Improving the Estimation of Word Importance for News Multi-Document Summarization},
+    Proceedings of the 14th Conference of the European Chapter of the Association for Computational Linguistics, 2014.
+    \bibitem{COMP}
+    Ani Nenkova, Lucy Vanderwende, and Kathleen McKeown,
+    A Compositional Context Sensitive Multi-document Summarizer: Exploring the Factors That Influence Summarization,
+    Proceedings of the 29th Annual International ACM SIGIR Conference on Research and Development in Information Retrieval, 2006.
 \end{thebibliography}
 
 \end{document}
