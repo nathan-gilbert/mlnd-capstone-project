@@ -59,7 +59,11 @@ class RegSum(Summerizer):
                         else:
                             self.feature_vector.append(0.0)
 
-        # LLR - input document vs entire corpus
+        # LLR -  current document terms vs entire training corpus
+        for doc_set in all_docs_sets:
+            for doc in doc_set:
+                sentences = doc.annotations["sentences"]
+
 
         # TextRank
 

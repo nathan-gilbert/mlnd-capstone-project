@@ -140,6 +140,9 @@ approaches to summarization as well as features drawn from standard Natural
 Language Processing data manipulation approaches such as Named-Entity
 Recognition and Part of Speech tagging.
 
+RegSum incorporates features derived from Log-likelihood Ratio tests developed
+in \cite{TPSIG}.
+
 Once the baseline model and the RegSum+ (RegSum + any changes and additional
 features I implement during the data analysis) are implemented the RegSum+ model
 will need to tuned. Many variations of the feature set and hyperparameters will
@@ -169,7 +172,7 @@ this time.
 \begin{thebibliography}{99}
     \bibitem{CPBL}
     Kai Hong, John M. Conroy, Benoit Favre, Alex Kulesza, Hui Lin and Ani Nenkova,
-    \emph{A Repository of State of the Art and Competitive Baseline Summaries for Generic News Summarization,}
+    \emph{A Repository of State of the Art and Competitive Baseline Summaries for Generic News Summarization},
     Proceedings of LREC, 2014.
     \bibitem{RegSum}
     Kai Hong and Ani Nenkova,
@@ -177,8 +180,13 @@ this time.
     Proceedings of the 14th Conference of the European Chapter of the Association for Computational Linguistics, 2014.
     \bibitem{COMP}
     Ani Nenkova, Lucy Vanderwende, and Kathleen McKeown,
-    A Compositional Context Sensitive Multi-document Summarizer: Exploring the Factors That Influence Summarization,
+    \emph{A Compositional Context Sensitive Multi-document Summarizer: Exploring the Factors That Influence Summarization},
     Proceedings of the 29th Annual International ACM SIGIR Conference on Research and Development in Information Retrieval, 2006.
+    \bibitem{TPSIG}
+    Chin-Yew Lin and Eduard Hovy,
+    \emph{The automated acquisition of topic signatures for text summarization},
+    Proceedings of the 18th conference on Computational linguistics,
+    2000
 \end{thebibliography}
 
 \end{document}
