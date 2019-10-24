@@ -7,18 +7,14 @@
 \maketitle
 
 \begin{abstract}
-    Identifying and summarizing relevant information in a given document is a task
-    that can help reduce the time required for acquiring and acting on new
-    information. Accurate summaries can reduce reading time and personalized
-    summaries could help a reader better understand material they care about most.
-    The work described in this project identifies relevant recent advancements in
-    the field of \textbf{Document Summarization}, attempts to replicate this work as
-    a web service for serving summarizations on demand.
+    Identifying and summarizing relevant information in a given document is a task that can help reduce the time required for acquiring and acting on new information.
+    Accurate summaries can reduce reading time and personalized summaries could help a reader better understand material they care about most.
+    The work described in this project identifies relevant recent advancements in the field of \textbf{Document Summarization}, attempts to replicate this work as a web service for serving summarization on demand.
 \end{abstract}
 
 \section{Project Overview}
-Everyday we are bombarded with more information than is possible to process.
-Identifying and summarizing relevant information in a given document is a task
+Every day we are bombarded with more information than is possible to process.
+Identification of the most relevant information in a given document is a task
 that can help reduce the time required for acquiring and acting on new
 information. Accurate summaries can reduce reading time and personalized
 summaries could help a reader better understand material they care about most.
@@ -141,7 +137,7 @@ Language Processing data manipulation approaches such as Named-Entity
 Recognition and Part of Speech tagging.
 
 RegSum incorporates features derived from Log-likelihood Ratio tests developed
-in \cite{TPSIG}.
+in\cite{TPSIG}.
 
 Once the baseline model and the RegSum+ (RegSum + any changes and additional
 features I implement during the data analysis) are implemented the RegSum+ model
@@ -157,6 +153,9 @@ and supply a document to it and receive the summary should also be created at
 this time.
 
 \subsection{Preprocessing}
+There is substantial amounts of preprocessing required for document
+summarization. This project relies on multiple other NLP techniques such as
+tokenization, Named Entity Recognition and various forms of word similarity.
 \subsection{Implementation}
 \subsection{Refinement}
 
