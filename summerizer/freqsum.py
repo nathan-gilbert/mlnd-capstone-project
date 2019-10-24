@@ -5,6 +5,9 @@ from summerizer.summerizer import Summerizer
 
 
 class FreqSum(Summerizer):
+    """
+    Implementation of baseline summarizer
+    """
     def __init__(self):
         super().__init__()
         # List of sentences containing the summary
