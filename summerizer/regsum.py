@@ -70,7 +70,6 @@ class RegSum(Summerizer):
                 sentences = doc.annotations["sentences"]
                 ranked_sentences = self.__get_text_rank(sentences)[:3]
 
-
     def __word_location_features(self, all_docs):
         # 6 types
         # earliest first location
