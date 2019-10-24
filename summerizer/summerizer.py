@@ -111,6 +111,10 @@ class Summerizer:
         return len(total_tokens) > 100
 
     def _text_sents_tokens(self):
+        """
+        Create document sets for training files
+        :return: training doc set
+        """
         all_training_doc_sets = {}
         for doc in self.training_docs:
             # contains one set of documents from DUC

@@ -1,6 +1,9 @@
 import operator
 
+import networkx as nx
+import numpy as np
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics.pairwise import cosine_similarity
 
 from summerizer.summerizer import Summerizer
 
@@ -15,8 +18,8 @@ class RegSum(Summerizer):
 
     def train(self):
         self.__generate_features()
-        labels = self.__get_labels()
-        self.model.fit(self.feature_vector, labels)
+        # labels = self.__get_labels()
+        # self.model.fit(self.feature_vector, labels)
 
     def predict(self):
         pass
@@ -59,13 +62,11 @@ class RegSum(Summerizer):
                         else:
                             self.feature_vector.append(0.0)
 
-        # LLR -  current document terms vs entire training corpus
-        for doc_set in all_docs_sets:
-            for doc in doc_set:
+                # FutureWork: LLR -  current document terms vs entire training corpus
+
+                # TextRank
                 sentences = doc.annotations["sentences"]
-
-
-        # TextRank
+                ranked_sentences = self.__get_text_rank(sentences)
 
     def __word_location_features(self, all_docs):
         # 6 types
@@ -83,3 +84,47 @@ class RegSum(Summerizer):
 
     def __get_labels(self):
         pass
+
+    def __get_text_rank(self, sentences):
+        """
+        Generate a ranked list of sentences from the document that are ranked by the PageRank algorithm.
+        :return: ranked_sentences
+        """
+        # Extract word vectors
+        word_embeddings = {}
+        f = open('glove.6B.100d.txt', encoding='utf-8')
+        for line in f:
+            values = line.split()
+            word = values[0]
+            coefs = np.asarray(values[1:], dtype='float32')
+            word_embeddings[word] = coefs
+        f.close()
+
+        clean_sentences = [self._remove_stop_words(r.split()) for r in sentences]
+        sentence_vectors = []
+        for i in clean_sentences:
+            if len(i) != 0:
+                v = sum([word_embeddings.get(w, np.zeros((100,))) for w in i.split()]) / (len(i.split()) + 0.001)
+            else:
+                v = np.zeros((100,))
+            sentence_vectors.append(v)
+
+        # similarity matrix
+        sim_mat = np.zeros([len(sentences), len(sentences)])
+        for i in range(len(sentences)):
+            for j in range(len(sentences)):
+                if i != j:
+                    sim_mat[i][j] = \
+                        cosine_similarity(
+                            sentence_vectors[i].reshape(1, 100), sentence_vectors[j].reshape(1, 100)
+                        )[0, 0]
+
+        nx_graph = nx.from_numpy_array(sim_mat)
+        scores = nx.pagerank(nx_graph)
+        ranked_sentences = sorted(((scores[i], s) for i, s in enumerate(sentences)), reverse=True)
+        return ranked_sentences
+
+
+if __name__ == "__main__":
+    rs = RegSum()
+    rs.train()
