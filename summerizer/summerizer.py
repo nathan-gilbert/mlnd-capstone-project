@@ -40,6 +40,15 @@ class Summerizer:
         """
         return [word for word in word_list if word not in stopwords.words('english')]
 
+    @staticmethod
+    def _is_stop_word(word):
+        """
+        Returns true if the supplied word is an English stop word
+        :param word:
+        :return: boolean
+        """
+        return word in stopwords.words('english')
+
     def train(self):
         raise NotImplementedError
 

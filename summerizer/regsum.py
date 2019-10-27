@@ -1,25 +1,38 @@
+import uuid
 import operator
+import os
+import sys
 
 import networkx as nx
 import numpy as np
+import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics.pairwise import cosine_similarity
 
+sys.path.insert(0, '.')
+sys.path.insert(0, '..')
 from summerizer.summerizer import Summerizer
+from summerizer.annotations.annotation_set import AnnotationSet
+from data_utils.data_organizer import get_subfolders
 
 
 class RegSum(Summerizer):
     def __init__(self):
         super().__init__()
         self.__summary = []
-        self.feature_vector = None
-        self.feature_vector_columns = None
+        self.feature_vectors = None
+        self.words2uuids = {}
         self.model = LogisticRegression()
 
     def train(self):
         self.__generate_features()
-        # labels = self.__get_labels()
-        # self.model.fit(self.feature_vector, labels)
+        self.__get_labels()
+
+        # create the Logistic Regression model
+        self.feature_vectors = pd.DataFrame(self.feature_vectors)
+        X = pd.DataFrame(self.feature_vectors.iloc[:, :-1])
+        y = pd.DataFrame(self.feature_vectors.iloc[:, -1])
+        self.model.fit(X, y)
 
     def predict(self):
         pass
@@ -28,6 +41,9 @@ class RegSum(Summerizer):
         raise NotImplementedError
 
     def __generate_features(self):
+        # map column name to index
+        self.feature_vectors = []
+
         # iterate over sentences and build feature vectors
         print("Training on documents: ")
         all_training_doc_sets = self._text_sents_tokens()
@@ -37,9 +53,12 @@ class RegSum(Summerizer):
         for doc_set in all_training_doc_sets.values():
             doc_set.create_word_probabilities()
 
-            # create global word counts for LLR
-            # for word, count in doc_set.word_counts.items():
-            #    global_counts = global_counts.get(word, 0) + count
+            # create global word counts for top_k & LLR
+            for word, count in doc_set.word_counts.items():
+                # don't count stop words obvs
+                if self._is_stop_word(word):
+                    continue
+                global_counts[word] = global_counts.get(word, 0) + count
 
             # get the top 1000 words in the training set
             top_1000_counts = sorted(global_counts.items(),
@@ -49,26 +68,43 @@ class RegSum(Summerizer):
         self.__unsupervised_features(all_training_doc_sets, top_1000_counts)
         # self.__word_location_features(all_training_doc_sets)
         # self.__word_type_features(all_training_doc_sets)
+        # convert to Pandas Dataframe
 
-    def __unsupervised_features(self, all_docs_sets, top_k_counts):
-        # FreqSum - take the top K words from training data
-        for doc_set in all_docs_sets:
-            for doc in doc_set:
+    def __unsupervised_features(self, all_doc_sets, top_k_counts):
+        # FreqSum - take the top K (non stop word) words from training data
+        for doc_set in all_doc_sets:
+            print(f"Document: {doc_set}...")
+            # iterating over all documents in data
+            for doc in all_doc_sets[doc_set]:
                 sentences = doc.annotations["sentences"]
+                s = 1
+                # iterating over all sentences in data
                 for sentence in sentences:
+                    print(f"\tSentence {s}/{len(sentences)}...")
                     word_list = self._remove_stop_words(self._normalize(sentence.text))
-                    for top_k in top_k_counts:
-                        self.feature_vector_columns.append(top_k)
-                        if top_k in word_list:
-                            self.feature_vector.append(doc_set.word_counts.get(top_k, 0.0))
-                        else:
-                            self.feature_vector.append(0.0)
-
+                    # iterating over words in sentences in documents of the data
+                    word_id = 0
+                    word_key = f"{doc_set}:{s}:{word_id}"
+                    for word in word_list:
+                        feature_vector = {}
+                        row_uuid = uuid.uuid4()
+                        # Where the mapping from a particular word in the data to uuid is set
+                        self.words2uuids[word_key] = row_uuid
+                        feature_vector["uuid"] = row_uuid
+                        feature_vector["word"] = word
+                        feature_vector["word_key"] = word_key
+                        for top_k in top_k_counts:
+                            if top_k in word_list:
+                                feature_vector[top_k] = 1
+                            else:
+                                feature_vector[top_k] = 0
+                        word_id += 1
+                        self.feature_vectors.append(feature_vector)
+                    s += 1
                 # FutureWork: LLR -  current document terms vs entire training corpus
-
                 # TextRank
-                sentences = doc.annotations["sentences"]
-                ranked_sentences = self.__get_text_rank(sentences)[:3]
+                # sentences = doc.annotations["sentences"]
+                # ranked_sentences = self.__get_text_rank(sentences)[:3]
 
     def __word_location_features(self, all_docs):
         # 6 types
@@ -85,7 +121,23 @@ class RegSum(Summerizer):
         pass
 
     def __get_labels(self):
-        pass
+        for doc in self.training_docs:
+            doc_path = self.training_dir + os.path.sep + doc
+            input_docs = get_subfolders(doc_path)
+            for in_doc in input_docs:
+                if in_doc != 'keys':
+                    continue
+                keys = AnnotationSet("answer_keys")
+                key_file = f"{doc_path}{os.path.sep}keys{os.path.sep}annotations{os.path.sep}answer_keys"
+                keys.read_annotation_file(key_file)
+                key_text = keys.get(0).text.replace("\n", " ").lower()
+                key_cleaned = self._remove_stop_words(key_text.split())
+
+                for vec in self.feature_vectors:
+                    if vec['word'] in key_cleaned:
+                        vec['target'] = 1
+                    else:
+                        vec['target'] = 0
 
     # pylint: disable=too-many-locals
     def __get_text_rank(self, sentences):
@@ -132,4 +184,12 @@ class RegSum(Summerizer):
 
 if __name__ == "__main__":
     rs = RegSum()
+    rs.training_dir = "/Users/nathan/Documents/Data/summarization/duc2003"
+    rs.training_docs = ["0", "1", "10", "11", "12", "13", "14", "15", "16",
+                             "17", "18", "19", "2", "20", "21", "22", "23", "24",
+                             "25", "26", "27", "28", "29", "3", "30", "31", "32",
+                             "33", "34", "35", "36", "37", "38", "39", "4", "40",
+                             "41", "42", "43", "44", "45", "46", "47", "48", "49",
+                             "5", "50", "51", "52", "53", "54", "55", "56", "57",
+                             "58", "59", "6", "7", "8", "9"]
     rs.train()
