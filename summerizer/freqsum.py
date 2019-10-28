@@ -33,7 +33,7 @@ class FreqSum(Summerizer):
         :return:
         """
         print("Training on documents: ")
-        all_training_doc_sets = self._text_sents_tokens()
+        all_training_doc_sets = self.basic_text_preprocess()
 
         for doc_set in all_training_doc_sets.values():
             doc_set.create_word_probabilities()

@@ -49,6 +49,28 @@ class Summerizer:
         """
         return word in stopwords.words('english')
 
+    @staticmethod
+    def basic_text_preprocess(doc_dir, doc_list):
+        """
+        Create document sets for training files
+        :return: training doc set
+        """
+        all_doc_sets = {}
+        for doc in doc_list:
+            # contains one set of documents from DUC
+            print(f"{doc_dir}{os.path.sep}{doc}")
+            doc_set = DocumentSet(doc)
+            doc_path = doc_dir + os.path.sep + doc
+            input_docs = get_subfolders(doc_path)
+            for in_doc in input_docs:
+                if in_doc == 'keys':
+                    # skip the keys for now...
+                    continue
+                processed_doc = Document(doc_path, in_doc, ["full_text", "sentences", "tokens"])
+                doc_set.add(processed_doc)
+            all_doc_sets[doc] = doc_set
+        return all_doc_sets
+
     def train(self):
         raise NotImplementedError
 
@@ -118,24 +140,3 @@ class Summerizer:
             text.lower().translate(self.__remove_punctuation_map)
         )
         return len(total_tokens) > 100
-
-    def _text_sents_tokens(self):
-        """
-        Create document sets for training files
-        :return: training doc set
-        """
-        all_training_doc_sets = {}
-        for doc in self.training_docs:
-            # contains one set of documents from DUC
-            print(f"{self.training_dir}{os.path.sep}{doc}")
-            doc_set = DocumentSet(doc)
-            doc_path = self.training_dir + os.path.sep + doc
-            input_docs = get_subfolders(doc_path)
-            for in_doc in input_docs:
-                if in_doc == 'keys':
-                    # skip the keys for now...
-                    continue
-                processed_doc = Document(doc_path, in_doc, ["full_text", "sentences", "tokens"])
-                doc_set.add(processed_doc)
-            all_training_doc_sets[doc] = doc_set
-        return all_training_doc_sets

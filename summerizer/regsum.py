@@ -2,6 +2,7 @@ import uuid
 import operator
 import os
 import sys
+from collections import defaultdict
 
 import networkx as nx
 import numpy as np
@@ -21,41 +22,95 @@ class RegSum(Summerizer):
     def __init__(self):
         super().__init__()
         self.__summary = []
-        self.feature_vectors = None
+        self.training_feature_vectors = None
+        self.top_1000_counts = None
         self.words2uuids = {}
         self.model = LogisticRegression()
 
     def train(self):
-        self.__generate_features()
+        """
+
+        :return:
+        """
+        self.__generate_training_features()
         self.__get_labels()
 
         # create the Logistic Regression model
-        self.feature_vectors = pd.DataFrame(self.feature_vectors)
-        X = pd.DataFrame(self.feature_vectors.iloc[:, :-1])
+        self.training_feature_vectors = pd.DataFrame(self.training_feature_vectors)
+        X = pd.DataFrame(self.training_feature_vectors.iloc[:, :-1])
         X = X.drop('uuid', axis=1)
         X = X.drop('word', axis=1)
         X = X.drop('word_key', axis=1)
-        y = pd.DataFrame(self.feature_vectors.iloc[:, -1])
+        y = pd.DataFrame(self.training_feature_vectors.iloc[:, -1])
         y = column_or_1d(y, warn=True)
         self.model.fit(X, y)
         print("LogisticRegression model was trained.")
 
     def predict(self):
-        pass
+        """
 
-    def create_summary(self, src_docs):
-        raise NotImplementedError
+        :return:
+        """
+        return self.__generate_testing_features()
 
-    def __generate_features(self):
+    def create_summary(self, doc_scores):
+        """
+
+        :param doc_scores:
+        :return:
+        """
+        doc_summaries = {}
+        for doc in doc_scores:
+            summary = {}
+            sorted_by_score = sorted(doc_scores[doc].items(), key=operator.itemgetter(1), reverse=True)
+            for text, score in sorted_by_score:
+                if score < 1:
+                    continue
+                if self._cosine_sim_check(text, summary):
+                    summary[text] = score
+                if self._size_check(summary):
+                    break
+            doc_summaries[doc] = summary
+        return doc_summaries
+
+    def __generate_testing_features(self):
+        self.testing_feature_vectors = []
+        print("Testing on documents: ")
+        # get all testing docs
+        all_testing_doc_sets = self.basic_text_preprocess(self.test_dir, self.test_docs)
+        doc_scores = defaultdict(dict)
+        for doc_set in all_testing_doc_sets:
+            # iterate over sentences
+            for doc in all_testing_doc_sets[doc_set]:
+                test_doc_path = f"{self.test_dir}{os.path.sep}{doc_set}"
+                sentences = doc.annotations["sentences"]
+                feature_vectors = []
+                sentence_scores = {}
+                for sentence in sentences:
+                    word_list = self._remove_stop_words(self._normalize(sentence.text))
+                    for word in word_list:
+                        feature_vector = {}
+                        # get feature vector for word
+                        self.top_word_features(feature_vector, word)
+                        # add to feature vector list for sentence
+                        feature_vectors.append(feature_vector)
+                    # map word vectors to logreg prediction for sentence
+                    X = pd.DataFrame(feature_vectors)
+                    y = self.model.predict(X)
+                    # sum words in a sentence
+                    sentence_scores[sentence.text] = sum(y)
+                doc_scores[test_doc_path].update(sentence_scores)
+        return doc_scores
+
+    def __generate_training_features(self):
         # map column name to index
-        self.feature_vectors = []
+        self.training_feature_vectors = []
 
         # iterate over sentences and build feature vectors
         print("Training on documents: ")
-        all_training_doc_sets = self._text_sents_tokens()
+        all_training_doc_sets = self.basic_text_preprocess(self.training_dir, self.training_docs)
 
         global_counts = {}
-        top_1000_counts = []
         for doc_set in all_training_doc_sets.values():
             doc_set.create_word_probabilities()
 
@@ -67,16 +122,19 @@ class RegSum(Summerizer):
                 global_counts[word] = global_counts.get(word, 0) + count
 
             # get the top 1000 words in the training set
-            top_1000_counts = sorted(global_counts.items(),
-                                     key=operator.itemgetter(1),
-                                     reverse=True)[:1000]
+            self.top_1000_counts = sorted(global_counts.items(),
+                                          key=operator.itemgetter(1),
+                                          reverse=True)[:1000]
 
-        self.__unsupervised_features(all_training_doc_sets, top_1000_counts)
+        self.__unsupervised_features(all_training_doc_sets, self.training_feature_vectors)
         # self.__word_location_features(all_training_doc_sets)
         # self.__word_type_features(all_training_doc_sets)
         # convert to Pandas Dataframe
 
-    def __unsupervised_features(self, all_doc_sets, top_k_counts):
+    def __unsupervised_features(self, all_doc_sets, feature_vectors):
+        if self.top_1000_counts is None:
+            raise Exception("top 1000 counts is None")
+
         # FreqSum - take the top K (non stop word) words from training data
         for doc_set in all_doc_sets:
             print(f"Document: {doc_set}...")
@@ -99,18 +157,21 @@ class RegSum(Summerizer):
                         feature_vector["uuid"] = row_uuid
                         feature_vector["word"] = word
                         feature_vector["word_key"] = word_key
-                        for top_k in top_k_counts:
-                            if top_k in word_list:
-                                feature_vector[top_k] = 1
-                            else:
-                                feature_vector[top_k] = 0
+                        self.top_word_features(feature_vector, word)
                         word_id += 1
-                        self.feature_vectors.append(feature_vector)
+                        feature_vectors.append(feature_vector)
                     s += 1
                 # FutureWork: LLR -  current document terms vs entire training corpus
                 # TextRank
                 # sentences = doc.annotations["sentences"]
                 # ranked_sentences = self.__get_text_rank(sentences)[:3]
+
+    def top_word_features(self, feature_vector, word):
+        for topK_word, _ in self.top_1000_counts:
+            if topK_word == word:
+                feature_vector[topK_word] = 1.0
+            else:
+                feature_vector[topK_word] = 0.0
 
     def __word_location_features(self, all_docs):
         # 6 types
@@ -139,7 +200,7 @@ class RegSum(Summerizer):
                 key_text = keys.get(0).text.replace("\n", " ").lower()
                 key_cleaned = self._remove_stop_words(key_text.split())
 
-                for vec in self.feature_vectors:
+                for vec in self.training_feature_vectors:
                     if vec['word'] in key_cleaned:
                         vec['target'] = 1
                     else:
@@ -199,3 +260,10 @@ if __name__ == "__main__":
                              "5", "50", "51", "52", "53", "54", "55", "56", "57",
                              "58", "59", "6", "7", "8", "9"]
     rs.train()
+    rs.test_dir = "/Users/nathan/Documents/Data/summarization/duc2004"
+    rs.test_docs = ["0"]
+    doc_scores = rs.predict()
+    hyp_summaries = rs.create_summary(doc_scores)
+    print(hyp_summaries)
+    scores = rs.score(hyp_summaries)
+    print(scores)
