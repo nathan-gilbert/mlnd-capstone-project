@@ -8,6 +8,7 @@ import numpy as np
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.utils import column_or_1d
 
 sys.path.insert(0, '.')
 sys.path.insert(0, '..')
@@ -31,8 +32,13 @@ class RegSum(Summerizer):
         # create the Logistic Regression model
         self.feature_vectors = pd.DataFrame(self.feature_vectors)
         X = pd.DataFrame(self.feature_vectors.iloc[:, :-1])
+        X = X.drop('uuid', axis=1)
+        X = X.drop('word', axis=1)
+        X = X.drop('word_key', axis=1)
         y = pd.DataFrame(self.feature_vectors.iloc[:, -1])
+        y = column_or_1d(y, warn=True)
         self.model.fit(X, y)
+        print("LogisticRegression model was trained.")
 
     def predict(self):
         pass
