@@ -157,6 +157,18 @@ There is substantial amounts of preprocessing required for document
 summarization. This project relies on multiple other NLP techniques such as
 tokenization, Named Entity Recognition and various forms of word similarity.
 \subsection{Implementation}
+
+\begin{table}[h]
+    \begin{tabular}{llll}
+        Metric & Recall & Precision & F-Measure \\
+        ROUGE-1 & 0.2669 & 0.2495 & 0.2569 \\
+        ROUGE-2 & 0.0666 & 0.05888 & 0.0622 \\
+        ROUGE-L & 0.2327 & 0.2177 &  0.2219
+    \end{tabular}
+    \caption{\emph{FreqSum} results}
+    \label{table:freqresults}
+\end{table}
+
 \subsection{Refinement}
 
 \section{Results}
@@ -168,6 +180,7 @@ tokenization, Named Entity Recognition and various forms of word similarity.
 \subsection{Reflection}
 \subsection{Future Work}
 
+\newpage
 \begin{thebibliography}{99}
     \bibitem{CPBL}
     Kai Hong, John M. Conroy, Benoit Favre, Alex Kulesza, Hui Lin and Ani Nenkova,
