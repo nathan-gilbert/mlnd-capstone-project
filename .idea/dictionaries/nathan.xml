@@ -2,6 +2,7 @@
   <dictionary name="nathan">
     <words>
       <w>pylint</w>
+      <w>regsum</w>
       <w>summarization</w>
       <w>summerizer</w>
       <w>tfidf</w>
