@@ -156,11 +156,19 @@ this time.
 There is substantial amounts of preprocessing required for document
 summarization. This project relies on multiple other NLP techniques such as
 tokenization, Named Entity Recognition and various forms of word similarity.
+
+
+
 \subsection{Implementation}
+
+In Table~\ref{table:freqduc2003}, the results for the baseline \emph{FreqSum} system
+are provided on the training set of DUC2003 documents. Since \emph{FreqSum} is
+unsupervised we are able to present scores for the delegated training set as
+well as the testing set of DUC2004. Those results are found in Table~\ref{table:freqduc2004}.
 
 \begin{table}[h]
     \centering
-    \begin{tabular}{|l|l|l|l|}
+    \begin{tabular}{llll}
         \hline
         Metric & Recall & Precision & F-Measure \\ \hline
         ROUGE-1 & 0.2570 & 0.2311 & 0.2419 \\ \hline
@@ -173,7 +181,7 @@ tokenization, Named Entity Recognition and various forms of word similarity.
 
 \begin{table}[h]
     \centering
-    \begin{tabular}{|l|l|l|l|}
+    \begin{tabular}{llll}
         \hline
         Metric & Recall & Precision & F-Measure \\ \hline
         ROUGE-1 & 0.2669 & 0.2495 & 0.2569 \\ \hline
@@ -182,6 +190,23 @@ tokenization, Named Entity Recognition and various forms of word similarity.
     \end{tabular}
     \caption{\emph{FreqSum} results of DUC2004}
     \label{table:freqduc2004}
+\end{table}
+
+The first implementation of the \emph{RegSum} system only contained the
+\emph{topK} feature set. It performed noticeablely worse than the \emph{FreqSum}
+system as documented in Table~\ref{table:regsumduc2004}.
+
+\begin{table}[h]
+    \centering
+    \begin{tabular}{llll}
+        \hline
+        Metric & Recall & Precision & F-Measure \\ \hline
+        ROUGE-1 & 0.1980 & 0.1833 & 0.1897 \\ \hline
+        ROUGE-2 & 0.0262 & 0.0254 & 0.0256 \\ \hline
+        ROUGE-L & 0.1768 & 0.1634 & 0.1678  \\ \hline
+    \end{tabular}
+    \caption{\emph{RegSum} topK results for DUC2004}
+    \label{table:regsumduc2004}
 \end{table}
 
 \subsection{Refinement}

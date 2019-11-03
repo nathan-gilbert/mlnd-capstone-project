@@ -53,14 +53,15 @@ class RegSum(Summerizer):
         """
         return self.__generate_testing_features()
 
-    def create_summary(self, doc_scores):
+    def create_summary(self, dss):
         """
 
-        :param doc_scores:
+        :param dss: document sentence scores
         :return:
         """
         doc_summaries = {}
-        for doc in doc_scores:
+        for doc in dss:
+            print(f"Generating summary for document: {doc}")
             summary = {}
             sorted_by_score = sorted(doc_scores[doc].items(), key=operator.itemgetter(1), reverse=True)
             for text, score in sorted_by_score:
@@ -70,6 +71,9 @@ class RegSum(Summerizer):
                     summary[text] = score
                 if self._size_check(summary):
                     break
+            if len(summary.items()) < 1:
+                # grab the first 4 sentences
+                summary = {k: v for (k, v) in sorted_by_score[:3]}
             doc_summaries[doc] = summary
         return doc_summaries
 
@@ -78,10 +82,11 @@ class RegSum(Summerizer):
         print("Testing on documents: ")
         # get all testing docs
         all_testing_doc_sets = self.basic_text_preprocess(self.test_dir, self.test_docs)
-        doc_scores = defaultdict(dict)
+        doc_sentence_scores = defaultdict(dict)
         for doc_set in all_testing_doc_sets:
             # iterate over sentences
             for doc in all_testing_doc_sets[doc_set]:
+                print(f"Scoring sentences for doc: {doc_set}/{doc.name}")
                 test_doc_path = f"{self.test_dir}{os.path.sep}{doc_set}"
                 sentences = doc.annotations["sentences"]
                 feature_vectors = []
@@ -99,8 +104,8 @@ class RegSum(Summerizer):
                     y = self.model.predict(X)
                     # sum words in a sentence
                     sentence_scores[sentence.text] = sum(y)
-                doc_scores[test_doc_path].update(sentence_scores)
-        return doc_scores
+                doc_sentence_scores[test_doc_path].update(sentence_scores)
+        return doc_sentence_scores
 
     def __generate_training_features(self):
         # map column name to index
@@ -137,14 +142,15 @@ class RegSum(Summerizer):
 
         # FreqSum - take the top K (non stop word) words from training data
         for doc_set in all_doc_sets:
-            print(f"Document: {doc_set}...")
+            # print(f"Document: {doc_set}...")
             # iterating over all documents in data
             for doc in all_doc_sets[doc_set]:
                 sentences = doc.annotations["sentences"]
+                textrank_sentences = self.__get_text_rank(sentences)[:3]
                 s = 1
                 # iterating over all sentences in data
                 for sentence in sentences:
-                    print(f"\tSentence {s}/{len(sentences)}...")
+                    # print(f"\tSentence {s}/{len(sentences)}...")
                     word_list = self._remove_stop_words(self._normalize(sentence.text))
                     # iterating over words in sentences in documents of the data
                     word_id = 0
@@ -159,12 +165,17 @@ class RegSum(Summerizer):
                         feature_vector["word_key"] = word_key
                         self.top_word_features(feature_vector, word)
                         word_id += 1
+
+                        # TextRank
+                        for _, trs in textrank_sentences:
+                            if word in trs.text.lower():
+                                feature_vector["textrank"] = True
+                            else:
+                                feature_vector["textrank"] = False
                         feature_vectors.append(feature_vector)
+
                     s += 1
                 # FutureWork: LLR -  current document terms vs entire training corpus
-                # TextRank
-                # sentences = doc.annotations["sentences"]
-                # ranked_sentences = self.__get_text_rank(sentences)[:3]
 
     def top_word_features(self, feature_vector, word):
         for topK_word, _ in self.top_1000_counts:
@@ -215,20 +226,20 @@ class RegSum(Summerizer):
         """
         # Extract word vectors
         word_embeddings = {}
-        with open('glove.6B.100d.txt', encoding='utf-8') as in_file:
+        with open('/Users/nathan/Documents/Data/glove/glove.6B.100d.txt', encoding='utf-8') as in_file:
             for line in in_file:
                 values = line.split()
                 word = values[0]
                 coefs = np.asarray(values[1:], dtype='float32')
                 word_embeddings[word] = coefs
 
-        clean_sentences = [self._remove_stop_words(r.split()) for r in sentences]
+        clean_sentences = [self._remove_stop_words(s.text.split()) for s in sentences]
         sentence_vectors = []
         for i in clean_sentences:
             if len(i) != 0:
                 s_v = sum(
-                    [word_embeddings.get(w, np.zeros((100,))) for w in i.split()]
-                ) / (len(i.split()) + 0.001)
+                    [word_embeddings.get(w, np.zeros((100,))) for w in i]
+                ) / (len(i) + 0.001)
             else:
                 s_v = np.zeros((100,))
             sentence_vectors.append(s_v)
@@ -244,8 +255,8 @@ class RegSum(Summerizer):
                         )[0, 0]
 
         nx_graph = nx.from_numpy_array(sim_mat)
-        scores = nx.pagerank(nx_graph)
-        ranked_sentences = sorted(((scores[i], s) for i, s in enumerate(sentences)), reverse=True)
+        textrank_scores = nx.pagerank(nx_graph)
+        ranked_sentences = sorted(((textrank_scores[i], s) for i, s in enumerate(sentences)), reverse=True)
         return ranked_sentences
 
 
@@ -261,9 +272,15 @@ if __name__ == "__main__":
                              "58", "59", "6", "7", "8", "9"]
     rs.train()
     rs.test_dir = "/Users/nathan/Documents/Data/summarization/duc2004"
-    rs.test_docs = ["0"]
+    rs.test_docs = ["0", "1"]
+    #rs.test_docs = ["0", "1", "10", "11", "12", "13", "14", "15", "16", "17",
+    #                "18", "19", "2", "20", "21", "22", "23", "24", "25", "26",
+    #                "27", "28", "29", "3", "30", "31", "32", "33", "34", "35",
+    #                "36", "37", "38", "39", "4", "40", "41", "42", "43", "44",
+    #                "45", "46", "47", "48", "49", "5", "6", "7", "8", "9"]
     doc_scores = rs.predict()
     hyp_summaries = rs.create_summary(doc_scores)
-    print(hyp_summaries)
+    print("Summaries were generated... scoring ...")
+    #print(hyp_summaries)
     scores = rs.score(hyp_summaries)
     print(scores)
